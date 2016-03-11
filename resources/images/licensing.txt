@@ -1,0 +1,6 @@
+The file Chess_Pieces_Sprite.svg.png is licensed under the Creative Commons  Attribution-Share Alike 3.0 Unported license.
+
+Description Chess pieces originally by User:Cburnett in a sprite image for use in computer applications.
+Date 	25 September 2014, 13:30:03
+Source 	http://commons.wikimedia.org/wiki/Template:SVG_chess_pieces
+Author 	jurgenwesterhof (adapted from work of Cburnett)
