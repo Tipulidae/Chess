@@ -14,8 +14,6 @@ public class Square extends Observable {
 	
 	public void place(Piece p) {
 		piece = p;
-		setChanged();
-		notifyObservers();
 	}
 	
 	public PieceColor color() {
@@ -34,9 +32,13 @@ public class Square extends Observable {
 		return piece.type() != PieceType.NONE;
 	}
 	
-	public void reset() {
-		piece = Piece.NONE;
+	public void refresh() {
 		setChanged();
 		notifyObservers();
+	}
+	
+	public void reset() {
+		piece = Piece.NONE;
+		refresh();
 	}
 }

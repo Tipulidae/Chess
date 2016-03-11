@@ -27,5 +27,6 @@ public class Queen extends Piece {
 		addPositionsInLine(moves, board, new Position(-1,-1), 8);
 		return moves;
 	}
+	
 
 }

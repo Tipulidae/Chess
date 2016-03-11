@@ -37,6 +37,14 @@ public class SquareLabel extends JLabel implements Observer {
 	public void update(Observable o, Object arg1) {
 		Square sq = (Square)o;
 		setIcon(PieceIcon.instance().icon(sq.color(), sq.type()));
-		
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SquareLabel) {
+			SquareLabel other = (SquareLabel) o;
+			return pos.equals(other.pos);
+		}
+		return false;
 	}
 }

@@ -8,15 +8,15 @@ import utils.PieceType;
 import utils.Position;
 
 public class Pawn extends Piece {
-	private boolean hasMoved = false;
+	private Position homeSquare;
 	public Pawn(Position pos, PieceColor color) {
 		super(pos, color);
 		type = PieceType.PAWN;
+		homeSquare = pos;
 	}
 
 	@Override
 	public void setPos(Position pos) {
-		if (!this.pos.equals(pos)) hasMoved = true;
 		super.setPos(pos);
 	}
 	
@@ -33,7 +33,7 @@ public class Pawn extends Piece {
 	
 	private void addForwardMoves(List<Position> moves, Board board) {
 		int length = 1;
-		if (!hasMoved) length = 2;
+		if (!hasMoved()) length = 2;
 		Position dir = new Position(0,1);
 		if (color == PieceColor.WHITE) dir = new Position(0,-1);
 		
@@ -66,5 +66,9 @@ public class Pawn extends Piece {
 	
 	private void addEnPassant(List<Position> moves, Board board) {
 		
+	}
+	
+	private boolean hasMoved() {
+		return !homeSquare.equals(pos);
 	}
 }

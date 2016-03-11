@@ -32,6 +32,15 @@ public abstract class Piece {
 		this.pos = pos;
 	}
 	
+	public Position getPos() {
+		return pos;
+	}
+	
+	@Override
+	public String toString() {
+		return color+" "+type+" "+pos;
+	}
+	
 	public abstract List<Position> validMoves(Board board);
 	
 	protected void addPositionsInLine(List<Position> positions, Board board, Position dir, int length) {
@@ -48,6 +57,15 @@ public abstract class Piece {
 				break;
 			}
 		}
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Piece) {
+			Piece other = (Piece) o;
+			return pos.equals(other.pos);
+		}
+		return false;
 	}
 	
 	protected List<Position> filterOutInvalidMoves(List<Position> moves, Board board) {

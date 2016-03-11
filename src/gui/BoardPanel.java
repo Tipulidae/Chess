@@ -23,10 +23,15 @@ public class BoardPanel extends JPanel {
 		BoardPanel bp = this;
 		MouseAdapter ma = new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-				SquareLabel sl = (SquareLabel) me.getSource();
-				ch.handleClick(sl, bp);
+				if (me.getButton() == MouseEvent.BUTTON1) {
+					SquareLabel sl = (SquareLabel) me.getSource();
+					ch.handleClick(sl, bp);
+				} else {
+					ch.undo();
+				}
 				//clickHandler.handleHumanClick(sl.getPos());
 			}
+			
 		};
 		
 
