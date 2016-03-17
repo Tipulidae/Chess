@@ -25,7 +25,7 @@ public class BoardPanel extends JPanel {
 			public void mousePressed(MouseEvent me) {
 				if (me.getButton() == MouseEvent.BUTTON1) {
 					SquareLabel sl = (SquareLabel) me.getSource();
-					ch.handleClick(sl, bp);
+					ch.handleClick(sl);
 				} else {
 					ch.undo();
 				}
@@ -46,7 +46,7 @@ public class BoardPanel extends JPanel {
 	}
 	
 	public void connect(Board board) {
-		ch = new ClickHandler(board);
+		ch = new ClickHandler(board, this);
 		for (int y=0; y<8; y++) {
 			for (int x=0; x<8; x++) {
 				Observer sl = (Observer)getComponent(x+8*y);

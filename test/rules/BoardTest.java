@@ -40,7 +40,7 @@ public class BoardTest {
 		assertTrue(board.occupied(a1));
 		assertFalse(board.occupied(a2));
 		
-		board.makeMove(new Move(a1,a2));
+		//board.makeMove(new Move(a1,a2));
 		assertNotEquals(a1,piece.getPos());
 		assertEquals(a2,piece.getPos());
 		assertFalse(board.occupied(a1));
@@ -61,18 +61,18 @@ public class BoardTest {
 		Move m2 = new Move(a2,a3);
 		Move m3 = new Move(a3,a4);
 		
-		board.makeMove(m1);
+		//board.makeMove(m1);
 		assertEquals(a2,piece.getPos());
-		board.makeMove(m2);
+		//board.makeMove(m2);
 		assertEquals(a3,piece.getPos());
-		board.makeMove(m3);
+		//board.makeMove(m3);
 		assertEquals(a4,piece.getPos());
 		
-		board.undoMove(m3);
+		//board.undoMove(m3);
 		assertEquals(a3,piece.getPos());
-		board.undoMove(m2);
+		//board.undoMove(m2);
 		assertEquals(a2,piece.getPos());
-		board.undoMove(m1);
+		//board.undoMove(m1);
 		assertEquals(a1,piece.getPos());
 	}
 
@@ -89,7 +89,7 @@ public class BoardTest {
 		board.place(pawn);
 		
 		Move Rxc5 = new Move(c1,c5);
-		board.makeMove(Rxc5);
+		//board.makeMove(Rxc5);
 		
 		assertEquals(rook, board.pieceAt(c5));
 		assertFalse(board.occupied(c1));

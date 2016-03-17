@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import rules.Board;
 import rules.Move;
@@ -10,58 +12,86 @@ import utils.PieceColor;
 import utils.Position;
 
 public class ClickHandler {
-	private Position from;
-	private Position to;
 	private SquareLabel selected;
+	private BoardPanel bp;
 	private Board board;
 	private List<Move> moveHistory;
 	
-	public ClickHandler(Board board) {
-		this.board = board;
-		moveHistory = new ArrayList<Move>();
-	}
+	private List<Move> possibleMoves;
 	
-	public void handleClick(SquareLabel sl, BoardPanel bp) {
-		Position pos = sl.getPos();
-		if (selected == null) {
-			if (board.occupied(pos)) {
-				selected = sl;
-				bp.markLegalMoves(board.validMoves(pos));
-				selected.setBackground(Color.RED);
-				from = pos;
-			}
-		} else {
-			if (!selected.equals(sl)) {
-				to = pos;
-				makeMove();
-			}
-			bp.unmarkAllSquares();
-			selected = null;
-		}
+	public ClickHandler(Board board, BoardPanel bp) {
+		this.board = board;
+		this.bp = bp;
+		moveHistory = new ArrayList<Move>();
 	}
 	
 	public void undo() {
 		if (moveHistory.isEmpty()) return;
-		Move lastMove = lastMove();
-		System.out.println("undo: "+lastMove);
-		board.undoMove(lastMove);
+		Move m = lastMove();
+		System.out.println("undo: "+m);
+		m.undo(board);
+		m.refresh(board);
+		resetSelections();
 	}
 	
-	private void makeMove() {
-		Move theMove = new Move(from, to);
-		board.makeMove(theMove);
-		System.out.println(theMove);
-		moveHistory.add(theMove);
-		//printAllValidMoves(PieceColor.opposite(theMove.mover.color()));
-		//System.out.println(theMove.mover.color()+": "+theMove);
-	}
-	
-	private void printAllValidMoves(PieceColor color) {
-		System.out.print("Valid "+color+" moves: ");
-		for (Move m : board.validMoves(color)) {
-			System.out.print(m+"; ");
+	public void handleClick(SquareLabel sl) {
+		Position pos = sl.getPos();
+		if (firstClick()) {
+			select(sl);
+		} else if (selectionIsValid(pos)) {
+			makeMove(pos);
+		} else if (board.occupied(pos)) {
+			select(sl);
+		} else {
+			resetSelections();
 		}
-		System.out.println();
+	}
+	
+	private boolean firstClick() {
+		return selected == null;
+	}
+	
+	
+	
+	private void select(SquareLabel sl) {
+		Position pos = sl.getPos();
+		if (board.occupied(pos)) {
+			possibleMoves = board.validMovesFrom(pos);
+			bp.markLegalMoves(possibleMoves.stream().
+					map(move -> move.to).
+					collect(Collectors.toList()));
+			
+			selected = sl;
+			selected.setBackground(Color.RED);
+		}
+	}
+	
+	private boolean selectionIsValid(Position pos) {
+		return getMove(pos) != null;
+	}
+	
+	private Move getMove(Position pos) {
+		for (Move m : possibleMoves) {
+			if (pos.equals(m.to)) return m;
+		}
+		return null;
+	}
+	
+	private void makeMove(Position pos) {
+		Move m = getMove(pos);
+		//board.makeMove(m);
+		m.perform(board);
+		m.refresh(board);
+		//board.refreshMove(m);
+		moveHistory.add(m);
+		System.out.println(m);
+		resetSelections();
+	}
+	
+	private void resetSelections() {
+		bp.unmarkAllSquares();
+		selected = null;
+		possibleMoves = Collections.emptyList();
 	}
 	
 	private Move lastMove() {

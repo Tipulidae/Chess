@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rules.Board;
+import rules.Castling;
+import rules.Move;
 import rules.Piece;
 import utils.PieceColor;
 import utils.PieceType;
@@ -19,15 +21,31 @@ public class King extends Piece {
 	@Override
 	public List<Position> validMoves(Board board) {
 		List<Position> moves = filterOutInvalidMoves(pos.neighbours(), board);
+		//addQueenSideCastle(board, moves);
+		return moves;
+	}
+	
+	@Override
+	public List<Move> realMoves(Board board) {
+		List<Move> moves = super.realMoves(board);
 		addQueenSideCastle(board, moves);
+		addKingSideCastle(board, moves);
 		return moves;
 	}
 
-	private void addQueenSideCastle(Board board, List<Position> moves) {
+	private void addQueenSideCastle(Board board, List<Move> moves) {
 		if (hasMoved() || board.pieceAt(queenSideRookPos()).hasMoved()) return;
 		if (!queenSidePositionsEmpty(board)) return;
 		if (!positionsAreSafe(board, queenSideSafePositions())) return;
-		moves.add(queenSideRookPos());
+		moves.add(new Castling(board, color, true));
+		//moves.add(queenSideRookPos());
+	}
+	
+	private void addKingSideCastle(Board board, List<Move> moves) {
+		if (hasMoved() || board.pieceAt(kingSideRookPos()).hasMoved()) return;
+		if (!kingSidePositionsEmpty(board)) return;
+		if (!positionsAreSafe(board, kingSideSafePositions())) return;
+		moves.add(new Castling(board, color, false));
 	}
 
 	@Override
@@ -44,14 +62,14 @@ public class King extends Piece {
 	}
 	
 	private boolean queenSidePositionsEmpty(Board board) {
-		if (color == PieceColor.WHITE)
-			return !(board.occupied(new Position("b1")) ||
-					 board.occupied(new Position("c1")) ||
-					 board.occupied(new Position("d1")));
-		else
-			return !(board.occupied(new Position("b8")) ||
-					 board.occupied(new Position("c8")) ||
-					 board.occupied(new Position("d8")));
+		return !(board.occupied(Position.add(pos, new Position(-1,0))) ||
+				 board.occupied(Position.add(pos, new Position(-2,0))) ||
+				 board.occupied(Position.add(pos, new Position(-3,0))));
+	}
+	
+	private boolean kingSidePositionsEmpty(Board board) {
+		return !(board.occupied(Position.add(pos, new Position(1,0))) ||
+				 board.occupied(Position.add(pos, new Position(2,0))));
 	}
 	
 	private List<Position> queenSideSafePositions() {
@@ -59,7 +77,14 @@ public class King extends Piece {
 		positions.add(pos);
 		positions.add(Position.add(pos, new Position(-1,0)));
 		positions.add(Position.add(pos, new Position(-2,0)));
-		positions.add(Position.add(pos, new Position(-3,0)));
+		return positions;
+	}
+	
+	private List<Position> kingSideSafePositions() {
+		List<Position> positions = new ArrayList<Position>();
+		positions.add(pos);
+		positions.add(Position.add(pos, new Position(1,0)));
+		positions.add(Position.add(pos, new Position(2,0)));
 		return positions;
 	}
 	

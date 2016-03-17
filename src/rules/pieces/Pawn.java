@@ -2,9 +2,12 @@ package rules.pieces;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import rules.Board;
+import rules.Move;
 import rules.Piece;
+import rules.Promotion;
 import utils.PieceColor;
 import utils.PieceType;
 import utils.Position;
@@ -21,8 +24,21 @@ public class Pawn extends Piece {
 		
 		addForwardMoves(moves, board);
 		addNormalAttackMoves(moves, board);
-		addEnPassant(moves, board);
+		//addEnPassant(moves, board);
 		
+		return moves;
+	}
+	
+	@Override
+	public List<Move> realMoves(Board board) {
+		List<Move> moves = super.realMoves(board);
+		//addPromotion(moves, board);
+		addEnPassant(moves, board);
+		if (rank() == 7) {
+			return moves.stream().
+					map(move -> new Promotion(move)).
+					collect(Collectors.toList());
+		}
 		return moves;
 	}
 	
@@ -59,10 +75,15 @@ public class Pawn extends Piece {
 		return p.withinBounds() && b.colorAt(p) == PieceColor.opposite(color);
 	}
 	
-	private void addEnPassant(List<Position> moves, Board board) {
+	private void addEnPassant(List<Move> moves, Board board) {
 		
 	}
 
+	private int rank() {
+		if (color == PieceColor.WHITE) return 8-pos.y;
+		else return pos.y+1;
+	}
+	
 	@Override
 	public String pieceName() {
 		return "";

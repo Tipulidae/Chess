@@ -38,6 +38,10 @@ public abstract class Piece {
 		return pos;
 	}
 	
+	public void youNeverMoved() {
+		hasMoved = false;
+	}
+	
 	public boolean hasMoved() {
 		return hasMoved;
 	}
@@ -47,8 +51,24 @@ public abstract class Piece {
 		return color+" "+type+" "+pos;
 	}
 	
-	public abstract String pieceName();
+	public List<Move> realMoves(Board board) {
+		return validMoves(board).stream().
+				map(to -> createMove(board, pos, to)).
+				filter(move -> board.kingWouldBeSafe(move)).
+				collect(Collectors.toList());
+	}
 	
+	
+	protected Move createMove(Board board, Position from, Position to) {
+		Move move = new Move(from, to);
+		move.mover = board.pieceAt(from);
+		move.target = board.pieceAt(to);
+		move.thisIsFirstMove = !hasMoved;
+		
+		return move;
+	}
+	
+	public abstract String pieceName();
 	public abstract List<Position> validMoves(Board board);
 	
 	protected void addPositionsInLine(List<Position> positions, Board board, Position dir, int length) {

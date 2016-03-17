@@ -84,58 +84,17 @@ public class Board {
 		place(new Pawn(new Position("h7"), PieceColor.BLACK));
 	}
 	
-	public void makeMove(Move move) {
-		move.mover = square(move.from).getPiece();
-		move.target = square(move.to).getPiece();
-		
-		square(move.from).place(Piece.NONE);
-		square(move.to).place(move.mover);
-		move.mover.setPos(move.to);
-		
-		pieces(move.target.color()).remove(move.target);
-		
-		refreshMove(move);
-		if (!kingIsSafe(PieceColor.opposite(move.mover.color())))
-			move.check = true;
+	
+	
+	public List<Move> validMovesFrom(Position from) {
+		Piece attacker = square(from).getPiece();
+		return attacker.realMoves(this);
 	}
-	
-	
-	
-	
-	public void undoMove(Move move) {
-		square(move.to).place(move.target);
-		square(move.from).place(move.mover);
-		move.mover.setPos(move.from);
-		
-		pieces(move.target.color()).add(move.target);
-		refreshMove(move);
-	}
-	
-	public void refreshMove(Move move) {
-		square(move.from).refresh();
-		square(move.to).refresh();
-	}
-	
-	private void tryMove(Move move) {
-		move.mover = square(move.from).getPiece();
-		move.target = square(move.to).getPiece();
-		
-		square(move.from).place(Piece.NONE);
-		square(move.to).place(move.mover);
-		
-		pieces(move.target.color()).remove(move.target);
-	}
-	
-	private void undoTriedMove(Move move) {
-		square(move.to).place(move.target);
-		square(move.from).place(move.mover);
-		pieces(move.target.color()).add(move.target);
-	}
-	
-	public List<Position> validMoves(Position pos) {
-		Piece attacker = square(pos).getPiece();
+	/*
+	public List<Position> validMoves(Position from) {
+		Piece attacker = square(from).getPiece();
 		return attacker.validMoves(this).stream().
-				filter(dest -> kingWouldBeSafe(new Move(pos,dest))).
+				filter(to -> kingWouldBeSafe(new Move(from,to))).
 				collect(Collectors.toList());
 	}
 	
@@ -152,19 +111,10 @@ public class Board {
 		}
 		
 		return moves;
-	}
+	}*/
 	
 	
-	public boolean squareIsSafeFrom(Position pos, PieceColor color) {
-		for (Piece attacker : pieces(color)) {
-			for (Position attackPos : attacker.validMoves(this)) {
-				if (attackPos.equals(pos)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+	
 	
 	
 	public boolean occupied(Position pos) {
@@ -182,7 +132,7 @@ public class Board {
 	public void place(Piece piece) {
 		Position p = piece.getPos();
 		square(p).place(piece);
-		pieces(piece.color()).add(piece);
+		addPiece(piece);
 		
 		if (piece.type() == PieceType.KING) {
 			if (piece.color() == PieceColor.WHITE) whiteKing = piece;
@@ -191,24 +141,49 @@ public class Board {
 		square(p).refresh();
 	}
 	
+	
+	public boolean kingWouldBeSafe(Move move) {
+		move.perform(this);
+		boolean result = kingIsSafe(move.mover.color());
+		move.undo(this);
+		return result;
+	}
+	
+	
+	
+	public boolean kingIsSafe(PieceColor color) {
+		return squareIsSafeFrom(king(color).getPos(), PieceColor.opposite(color));
+	}
+	
+	public boolean squareIsSafeFrom(Position pos, PieceColor color) {
+		for (Piece attacker : pieces(color)) {
+			for (Position attackPos : attacker.validMoves(this)) {
+				if (attackPos.equals(pos)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	public Square square(Position p) {
+		return squares[p.x][p.y];
+	}
+	
+	public void removePiece(Piece p) {
+		pieces(p.color()).remove(p);
+	}
+	
+	public void addPiece(Piece p) {
+		pieces(p.color()).add(p);
+	}
+	
 	private List<Piece> pieces(PieceColor color) {
 		if (color == PieceColor.WHITE) return whitePieces;
 		else if (color == PieceColor.BLACK) return blackPieces;
 		return new ArrayList<Piece>();
-	}
-	
-	
-	
-	
-	private boolean kingIsSafe(PieceColor color) {
-		return squareIsSafeFrom(king(color).getPos(), PieceColor.opposite(color));
-	}
-	
-	private boolean kingWouldBeSafe(Move move) {
-		tryMove(move);
-		boolean result = kingIsSafe(move.mover.color());
-		undoTriedMove(move);
-		return result;
 	}
 	
 	private Piece king(PieceColor color) {
@@ -216,10 +191,5 @@ public class Board {
 		else if (color == PieceColor.BLACK) return blackKing;
 		return Piece.NONE;
 	}
-	
-	private Square square(Position p) {
-		return squares[p.x][p.y];
-	}
-	
 	
 }

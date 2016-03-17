@@ -1,5 +1,6 @@
 package rules;
 
+import utils.PieceColor;
 import utils.PieceType;
 import utils.Position;
 
@@ -9,6 +10,10 @@ public class Move {
 	public Position from;
 	public Position to;
 	public boolean check = false;
+	public boolean thisIsFirstMove;
+	
+	public Move() {
+	}
 	
 	public Move(Position from, Position to) {
 		this.from = from;
@@ -18,6 +23,31 @@ public class Move {
 	public Move(String from, String to) {
 		this.from = new Position(from);
 		this.to = new Position(to);
+	}
+	
+	
+	public void perform(Board board) {
+		board.square(from).place(Piece.NONE);
+		board.square(to).place(mover);
+		mover.setPos(to);
+		
+		board.removePiece(target);
+	}
+	
+	public void undo(Board board) {
+		board.square(to).place(target);
+		board.square(from).place(mover);
+		mover.setPos(from);
+		if (thisIsFirstMove) mover.youNeverMoved();
+		
+		board.addPiece(target);
+	}
+	
+	public void refresh(Board board) {
+		board.square(from).refresh();
+		board.square(to).refresh();
+		//if (!board.kingIsSafe(PieceColor.opposite(mover.color())))
+		//	check = true;
 	}
 	
 	@Override
