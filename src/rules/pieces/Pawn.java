@@ -1,23 +1,18 @@
-package rules;
+package rules.pieces;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import rules.Board;
+import rules.Piece;
 import utils.PieceColor;
 import utils.PieceType;
 import utils.Position;
 
 public class Pawn extends Piece {
-	private Position homeSquare;
 	public Pawn(Position pos, PieceColor color) {
 		super(pos, color);
 		type = PieceType.PAWN;
-		homeSquare = pos;
-	}
-
-	@Override
-	public void setPos(Position pos) {
-		super.setPos(pos);
 	}
 	
 	@Override
@@ -67,8 +62,9 @@ public class Pawn extends Piece {
 	private void addEnPassant(List<Position> moves, Board board) {
 		
 	}
-	
-	private boolean hasMoved() {
-		return !homeSquare.equals(pos);
+
+	@Override
+	public String pieceName() {
+		return "";
 	}
 }

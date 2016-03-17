@@ -1,8 +1,10 @@
-package rules;
+package rules.pieces;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import rules.Board;
+import rules.Piece;
 import utils.PieceColor;
 import utils.PieceType;
 import utils.Position;
@@ -27,6 +29,11 @@ public class Knight extends Piece {
 		moves.add(Position.add(pos, new Position(-1,-2)));
 		
 		return filterOutInvalidMoves(moves, board);
+	}
+
+	@Override
+	public String pieceName() {
+		return "N";
 	}
 
 }

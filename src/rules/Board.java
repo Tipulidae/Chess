@@ -1,11 +1,19 @@
 package rules;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observer;
 import java.util.stream.Collectors;
 
+import rules.pieces.Bishop;
+import rules.pieces.King;
+import rules.pieces.Knight;
+import rules.pieces.Pawn;
+import rules.pieces.Queen;
+import rules.pieces.Rook;
 import utils.PieceColor;
+import utils.PieceType;
 import utils.Position;
 
 public class Board {
@@ -23,10 +31,15 @@ public class Board {
 				squares[x][y] = new Square();
 			}
 		}
+		
+		blackPieces = new ArrayList<Piece>();
+		whitePieces = new ArrayList<Piece>();
+		blackKing = Piece.NONE;
+		whiteKing = Piece.NONE;
 	}
 	
 	public void addSquareObserver(Observer o, Position pos) {
-		squares[pos.x][pos.y].addObserver(o);
+		square(pos).addObserver(o);
 	}
 	
 	public void setStartPositions() {
@@ -36,97 +49,87 @@ public class Board {
 			}
 		}
 		
-		blackKing = new King(new Position("e8"), PieceColor.BLACK);
-		whiteKing = new King(new Position("e1"), PieceColor.WHITE);
-		blackPieces = new ArrayList<Piece>();
-		whitePieces = new ArrayList<Piece>();
+		place(new Rook(new Position("a1"), PieceColor.WHITE));
+		place(new Knight(new Position("b1"), PieceColor.WHITE));
+		place(new Bishop(new Position("c1"), PieceColor.WHITE));
+		place(new Queen(new Position("d1"), PieceColor.WHITE));
+		place(new King(new Position("e1"), PieceColor.WHITE));
+		place(new Bishop(new Position("f1"), PieceColor.WHITE));
+		place(new Knight(new Position("g1"), PieceColor.WHITE));
+		place(new Rook(new Position("h1"), PieceColor.WHITE));
+		place(new Pawn(new Position("a2"), PieceColor.WHITE));
+		place(new Pawn(new Position("b2"), PieceColor.WHITE));
+		place(new Pawn(new Position("c2"), PieceColor.WHITE));
+		place(new Pawn(new Position("d2"), PieceColor.WHITE));
+		place(new Pawn(new Position("e2"), PieceColor.WHITE));
+		place(new Pawn(new Position("f2"), PieceColor.WHITE));
+		place(new Pawn(new Position("g2"), PieceColor.WHITE));
+		place(new Pawn(new Position("h2"), PieceColor.WHITE));
 		
-		squares[0][0].place(new Rook(new Position("a8"), PieceColor.BLACK));
-		squares[1][0].place(new Knight(new Position("b8"), PieceColor.BLACK));
-		squares[2][0].place(new Bishop(new Position("c8"), PieceColor.BLACK));
-		squares[3][0].place(new Queen(new Position("d8"), PieceColor.BLACK));
-		squares[4][0].place(blackKing);
-		squares[5][0].place(new Bishop(new Position("f8"), PieceColor.BLACK));
-		squares[6][0].place(new Knight(new Position("g8"), PieceColor.BLACK));
-		squares[7][0].place(new Rook(new Position("h8"), PieceColor.BLACK));
-		squares[0][1].place(new Pawn(new Position("a7"), PieceColor.BLACK));
-		squares[1][1].place(new Pawn(new Position("b7"), PieceColor.BLACK));
-		squares[2][1].place(new Pawn(new Position("c7"), PieceColor.BLACK));
-		squares[3][1].place(new Pawn(new Position("d7"), PieceColor.BLACK));
-		squares[4][1].place(new Pawn(new Position("e7"), PieceColor.BLACK));
-		squares[5][1].place(new Pawn(new Position("f7"), PieceColor.BLACK));
-		squares[6][1].place(new Pawn(new Position("g7"), PieceColor.BLACK));
-		squares[7][1].place(new Pawn(new Position("h7"), PieceColor.BLACK));
-		for (int x=0; x<8; x++) {
-			for (int y=0; y<2; y++) {
-				blackPieces.add(squares[x][y].getPiece());
-				squares[x][y].refresh();
-			}
-		}
-		
-		
-		squares[0][7].place(new Rook(new Position("a1"), PieceColor.WHITE));
-		squares[1][7].place(new Knight(new Position("b1"), PieceColor.WHITE));
-		squares[2][7].place(new Bishop(new Position("c1"), PieceColor.WHITE));
-		squares[3][7].place(new Queen(new Position("d1"), PieceColor.WHITE));
-		squares[4][7].place(whiteKing);
-		squares[5][7].place(new Bishop(new Position("f1"), PieceColor.WHITE));
-		squares[6][7].place(new Knight(new Position("g1"), PieceColor.WHITE));
-		squares[7][7].place(new Rook(new Position("h1"), PieceColor.WHITE));
-		squares[0][6].place(new Pawn(new Position("a2"), PieceColor.WHITE));
-		squares[1][6].place(new Pawn(new Position("b2"), PieceColor.WHITE));
-		squares[2][6].place(new Pawn(new Position("c2"), PieceColor.WHITE));
-		squares[3][6].place(new Pawn(new Position("d2"), PieceColor.WHITE));
-		squares[4][6].place(new Pawn(new Position("e2"), PieceColor.WHITE));
-		squares[5][6].place(new Pawn(new Position("f2"), PieceColor.WHITE));
-		squares[6][6].place(new Pawn(new Position("g2"), PieceColor.WHITE));
-		squares[7][6].place(new Pawn(new Position("h2"), PieceColor.WHITE));
-		for (int x=0; x<8; x++) {
-			for (int y=6; y<8; y++) {
-				whitePieces.add(squares[x][y].getPiece());
-				squares[x][y].refresh();
-			}
-		}
-	}
-	
-	public void makeMoveAndRefresh(Move move) {
-		makeMove(move);
-		refreshMove(move);
-		if (kingIsUnderAttack(PieceColor.opposite(move.mover.color())))
-			System.out.println("CHECK!");
-	}
-	
-	public void undoMoveAndRefresh(Move move) {
-		undoMove(move);
-		refreshMove(move);
+		place(new Rook(new Position("a8"), PieceColor.BLACK));
+		place(new Knight(new Position("b8"), PieceColor.BLACK));
+		place(new Bishop(new Position("c8"), PieceColor.BLACK));
+		place(new Queen(new Position("d8"), PieceColor.BLACK));
+		place(new King(new Position("e8"), PieceColor.BLACK));
+		place(new Bishop(new Position("f8"), PieceColor.BLACK));
+		place(new Knight(new Position("g8"), PieceColor.BLACK));
+		place(new Rook(new Position("h8"), PieceColor.BLACK));
+		place(new Pawn(new Position("a7"), PieceColor.BLACK));
+		place(new Pawn(new Position("b7"), PieceColor.BLACK));
+		place(new Pawn(new Position("c7"), PieceColor.BLACK));
+		place(new Pawn(new Position("d7"), PieceColor.BLACK));
+		place(new Pawn(new Position("e7"), PieceColor.BLACK));
+		place(new Pawn(new Position("f7"), PieceColor.BLACK));
+		place(new Pawn(new Position("g7"), PieceColor.BLACK));
+		place(new Pawn(new Position("h7"), PieceColor.BLACK));
 	}
 	
 	public void makeMove(Move move) {
-		move.mover = squares[move.from.x][move.from.y].getPiece();
-		move.target = squares[move.to.x][move.to.y].getPiece();
+		move.mover = square(move.from).getPiece();
+		move.target = square(move.to).getPiece();
 		
 		square(move.from).place(Piece.NONE);
 		square(move.to).place(move.mover);
 		move.mover.setPos(move.to);
 		
-		if (move.target.color() == PieceColor.BLACK) blackPieces.remove(move.target);
-		else if (move.target.color() == PieceColor.WHITE) whitePieces.remove(move.target);
+		pieces(move.target.color()).remove(move.target);
 		
-		
+		refreshMove(move);
+		if (!kingIsSafe(PieceColor.opposite(move.mover.color())))
+			move.check = true;
 	}
+	
+	
+	
 	
 	public void undoMove(Move move) {
 		square(move.to).place(move.target);
 		square(move.from).place(move.mover);
 		move.mover.setPos(move.from);
 		
-		if (move.target.color() == PieceColor.BLACK) blackPieces.add(move.target);
-		else if (move.target.color() == PieceColor.WHITE) whitePieces.add(move.target);
+		pieces(move.target.color()).add(move.target);
+		refreshMove(move);
 	}
 	
 	public void refreshMove(Move move) {
 		square(move.from).refresh();
 		square(move.to).refresh();
+	}
+	
+	private void tryMove(Move move) {
+		move.mover = square(move.from).getPiece();
+		move.target = square(move.to).getPiece();
+		
+		square(move.from).place(Piece.NONE);
+		square(move.to).place(move.mover);
+		
+		pieces(move.target.color()).remove(move.target);
+	}
+	
+	private void undoTriedMove(Move move) {
+		square(move.to).place(move.target);
+		square(move.from).place(move.mover);
+		pieces(move.target.color()).add(move.target);
 	}
 	
 	public List<Position> validMoves(Position pos) {
@@ -136,40 +139,32 @@ public class Board {
 				collect(Collectors.toList());
 	}
 	
-	
-	private boolean kingWouldBeSafe(Move move) {
-		makeMove(move);
-		boolean result = !kingIsUnderAttack(move.mover.color());
-		undoMove(move);
-		return result;
-	}
-	
-	
-	
-	private boolean kingIsUnderAttack(PieceColor color) {
-		
-		PieceColor attackColor = PieceColor.opposite(color);
-		if (attackColor == PieceColor.BLACK) {
-			for (Piece potentialAttacker : blackPieces) {
-				for (Position potentialAttack : potentialAttacker.validMoves(this)) {
-					if (whiteKing.getPos().equals(potentialAttack)) {
-						return true;
-					}
-				}
-			}
-		} else if (attackColor == PieceColor.WHITE) {
-			for (Piece potentialAttacker : whitePieces) {
-				for (Position potentialAttack : potentialAttacker.validMoves(this)) {
-					if (blackKing.getPos().equals(potentialAttack)) {
-						return true;
-					}
-				}
+	public List<Move> validMoves(PieceColor color) {
+		List<Move> moves = new ArrayList<Move>();		
+		for (Piece p : pieces(color)) {
+			Position from = p.getPos();
+			for (Position to : validMoves(from)) {
+				Move m = new Move(from, to);
+				m.mover = square(from).getPiece();
+				m.target = square(to).getPiece();
+				moves.add(m);
 			}
 		}
 		
-		return false;
+		return moves;
 	}
 	
+	
+	public boolean squareIsSafeFrom(Position pos, PieceColor color) {
+		for (Piece attacker : pieces(color)) {
+			for (Position attackPos : attacker.validMoves(this)) {
+				if (attackPos.equals(pos)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	
 	
 	public boolean occupied(Position pos) {
@@ -184,7 +179,47 @@ public class Board {
 		return square(pos).color();
 	}
 	
+	public void place(Piece piece) {
+		Position p = piece.getPos();
+		square(p).place(piece);
+		pieces(piece.color()).add(piece);
+		
+		if (piece.type() == PieceType.KING) {
+			if (piece.color() == PieceColor.WHITE) whiteKing = piece;
+			else if (piece.color() == PieceColor.BLACK) blackKing = piece;
+		}
+		square(p).refresh();
+	}
+	
+	private List<Piece> pieces(PieceColor color) {
+		if (color == PieceColor.WHITE) return whitePieces;
+		else if (color == PieceColor.BLACK) return blackPieces;
+		return new ArrayList<Piece>();
+	}
+	
+	
+	
+	
+	private boolean kingIsSafe(PieceColor color) {
+		return squareIsSafeFrom(king(color).getPos(), PieceColor.opposite(color));
+	}
+	
+	private boolean kingWouldBeSafe(Move move) {
+		tryMove(move);
+		boolean result = kingIsSafe(move.mover.color());
+		undoTriedMove(move);
+		return result;
+	}
+	
+	private Piece king(PieceColor color) {
+		if (color == PieceColor.WHITE) return whiteKing;
+		else if (color == PieceColor.BLACK) return blackKing;
+		return Piece.NONE;
+	}
+	
 	private Square square(Position p) {
 		return squares[p.x][p.y];
 	}
+	
+	
 }

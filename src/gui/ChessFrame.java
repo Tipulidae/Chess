@@ -1,10 +1,11 @@
 package gui;
 
 
-import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import rules.Board;
 
@@ -17,14 +18,15 @@ public class ChessFrame extends JFrame {
 		
 		ip = new InfoPanel();
 		panel = new BoardPanel();
-		ColumnLabels cl = new ColumnLabels();
-
-		add(BorderLayout.SOUTH, ip);
-		add(BorderLayout.CENTER, panel);
-		add(BorderLayout.NORTH, cl);
-		add(BorderLayout.WEST, new RowLabels());
 		
+		setLayout(new GridBagLayout());
 		
+		addToGrid(panel,1,1,8,8);
+		addToGrid(new ColumnLabels(), 1,0,8,1);
+		addToGrid(new ColumnLabels(), 1,9,8,1);
+		addToGrid(new RowLabels(), 0,1,1,8);
+		addToGrid(new RowLabels(), 9,1,1,8);
+		addToGrid(ip, 1,10,8,1);
 		
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,13 +40,13 @@ public class ChessFrame extends JFrame {
 		panel.connect(board);
 	}
 	
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				new ChessFrame();
-			}
-		});
+	private void addToGrid(Component comp, int x, int y, int width, int height) {
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.gridwidth = width;
+		c.gridheight = height;
+		c.fill = GridBagConstraints.BOTH;
+		add(comp,c);
 	}
 }

@@ -12,6 +12,7 @@ public abstract class Piece {
 	protected Position pos;
 	protected PieceColor color;
 	protected PieceType type;
+	private boolean hasMoved = false;
 	public Piece() {
 	}
 	
@@ -30,16 +31,23 @@ public abstract class Piece {
 	
 	public void setPos(Position pos) {
 		this.pos = pos;
+		hasMoved = true;
 	}
 	
 	public Position getPos() {
 		return pos;
 	}
 	
+	public boolean hasMoved() {
+		return hasMoved;
+	}
+	
 	@Override
 	public String toString() {
 		return color+" "+type+" "+pos;
 	}
+	
+	public abstract String pieceName();
 	
 	public abstract List<Position> validMoves(Board board);
 	
@@ -63,7 +71,7 @@ public abstract class Piece {
 	public boolean equals(Object o) {
 		if (o instanceof Piece) {
 			Piece other = (Piece) o;
-			return pos.equals(other.pos);
+			return pos.equals(other.pos) && type == other.type && color == other.color;
 		}
 		return false;
 	}
@@ -93,6 +101,11 @@ public abstract class Piece {
 		public List<Position> validMoves(Board board) {
 			return Collections.emptyList();
 			
+		}
+
+		@Override
+		public String pieceName() {
+			return "";
 		}
 		
 	};

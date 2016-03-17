@@ -23,6 +23,8 @@ public class Position {
 			x = label.indexOf(m.group(1).toLowerCase());
 			y = 8 - Integer.valueOf(m.group(2));
 		} else {
+			System.err.println("Invalid position notation! "+str);
+			System.exit(1);
 			x = 0;
 			y = 0;
 		}

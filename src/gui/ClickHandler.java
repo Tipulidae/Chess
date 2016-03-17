@@ -6,6 +6,7 @@ import java.util.List;
 
 import rules.Board;
 import rules.Move;
+import utils.PieceColor;
 import utils.Position;
 
 public class ClickHandler {
@@ -41,14 +42,29 @@ public class ClickHandler {
 	
 	public void undo() {
 		if (moveHistory.isEmpty()) return;
-		board.undoMoveAndRefresh(moveHistory.remove(moveHistory.size()-1));
+		Move lastMove = lastMove();
+		System.out.println("undo: "+lastMove);
+		board.undoMove(lastMove);
 	}
 	
 	private void makeMove() {
-		//System.out.println("making move "+from+" -> "+to);
-		//board.move(from,to);
 		Move theMove = new Move(from, to);
-		board.makeMoveAndRefresh(theMove);
+		board.makeMove(theMove);
+		System.out.println(theMove);
 		moveHistory.add(theMove);
+		//printAllValidMoves(PieceColor.opposite(theMove.mover.color()));
+		//System.out.println(theMove.mover.color()+": "+theMove);
+	}
+	
+	private void printAllValidMoves(PieceColor color) {
+		System.out.print("Valid "+color+" moves: ");
+		for (Move m : board.validMoves(color)) {
+			System.out.print(m+"; ");
+		}
+		System.out.println();
+	}
+	
+	private Move lastMove() {
+		return moveHistory.remove(moveHistory.size()-1);
 	}
 }
